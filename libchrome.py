@@ -189,7 +189,7 @@ class Chrome:
                     if old_url != self.url():
                         break
                     if datetime.now().timestamp() - start_tstamp > wait_timeout:
-                        log_err("timeout")
+                        log_err("url navigation timeout")
                         timeout = True
                         break
                     time.sleep(0.1)
@@ -203,10 +203,23 @@ class Chrome:
                         if wait_elem != None:
                             break
                         if datetime.now().timestamp() - start_tstamp > wait_timeout:
-                            log_err("timeout")
+                            log_err("wait element timeout")
                             timeout = True
                             break
                         time.sleep(0.1)
+
+            # wait for document.readyState is complete
+            if not timeout:
+                start_tstamp = datetime.now().timestamp()
+                while True:
+                    ready_state = self.run_script("document.readyState")
+                    if ready_state == "complete":
+                        break
+                    if datetime.now().timestamp() - start_tstamp > wait_timeout:
+                        log_err("wait for ready timeout")
+                        timeout = True
+                        break
+                    time.sleep(0.1)
 
             if not timeout:
                 ret = True
@@ -276,11 +289,16 @@ selectors;"""
             return None
 
     def set_value(self, selector: str, value: str):
+        b64selector = base64.b64encode(selector.encode()).decode()
         b64value = base64.b64encode(value.encode()).decode()
-        self.run_script(f"document.querySelector('{selector}').value=atob('{b64value}')")
+        self.run_script(f"document.querySelector(atob('{b64selector}')).focus()")
+        self.run_script(f"document.execCommand('selectAll', false, null)")
+        self.run_script(f"document.execCommand('delete', false, null)")
+        self.run_script(f"document.execCommand('insertText', false, atob('{b64value}'))")
 
     def click(self, selector: str):
-        self.run_script(f"document.querySelector('{selector}').click()")
+        b64selector = base64.b64encode(selector.encode()).decode()
+        self.run_script(f"document.querySelector(atob('{b64selector}')).click()")
 
 
 if __name__ == "__main__":
