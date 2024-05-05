@@ -15,18 +15,18 @@ REGISTER_URL = "https://shuffle.com/?md-tab=register&modal=auth"
 
 ACCOUNT_LIST = [
     {
-        "username": "testuser00",
-        "email": "testuser00@email.com",
+        "username": "testuser000",
+        "email": "testuser000@email.com",
         "password": "123qwe!@#QWE",
     },
     {
-        "username": "testuser01",
-        "email": "testuser01@email.com",
+        "username": "testuser001",
+        "email": "testuser001@email.com",
         "password": "123qwe!@#QWE",
     },
     {
-        "username": "testuser02",
-        "email": "testuser02@email.com",
+        "username": "testuser002",
+        "email": "testuser002@email.com",
         "password": "123qwe!@#QWE",
     },
 ]
