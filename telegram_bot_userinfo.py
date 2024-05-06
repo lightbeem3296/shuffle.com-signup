@@ -12,16 +12,13 @@ import pyperclip
 
 from liblogger import log_err, log_inf, log_warn
 
-TELEGRAM_GROUP_LINK = None
-# TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
-
 CUR_DIR = str(Path(__file__).parent.absolute())
 TDATA_LIST_DIR = os.path.join(CUR_DIR, "82tdata")
 TELEGRAM_DIR = os.path.join(CUR_DIR, "Telegram")
 TELEGRAM_BIN_PATH = os.path.join(TELEGRAM_DIR, "Telegram.exe")
 TDATA_PATH = os.path.join(TELEGRAM_DIR, "tdata")
 
-T_IMG_WRLCOME = "t_welcome.png"
+T_IMG_LOADING = "t_loading.png"
 T_IMG_TELEGRAM_CHANNEL = os.path.join(CUR_DIR, "t_telegram_channel.png")
 
 T_IMG_USERINFOBOT_LINK = os.path.join(CUR_DIR, "t_userinfobot_link.png")
@@ -59,6 +56,23 @@ def wait_for_img(img_path: str, timeout: float = 5):
         time.sleep(0.1)
     time.sleep(0.1)
     return img_box
+
+
+def wait_while_img(img_path: str, timeout: float = 30) -> bool:
+    ret = True
+    start_tstamp = datetime.now().timestamp()
+    while True:
+        if datetime.now().timestamp() - start_tstamp > timeout:
+            log_err("timeout")
+            ret = False
+            break
+        try:
+            pyautogui.locateOnScreen(img_path, confidence=0.8)
+        except:
+            break
+        time.sleep(0.1)
+    time.sleep(0.1)
+    return ret
 
 
 def wait_and_click_img(img_path: str, timeout: float = 5):
@@ -114,52 +128,45 @@ def work(tdata_dir_name: str):
         shutil.copytree(src_tdata_dir_path, TDATA_PATH)
 
         # open telegram process
-        subprocess.Popen([TELEGRAM_BIN_PATH])
+        proc = subprocess.Popen([TELEGRAM_BIN_PATH])
         log_inf("loading telegram ...")
-        wait_for_img(T_IMG_WRLCOME, 60)
         time.sleep(3)
 
-        # open telegram channel
-        pyautogui.hotkey("ctrl", "f")
-        pyautogui.write("telegram", interval=0.01)
-        time.sleep(0.5)
-        wait_and_click_img(T_IMG_TELEGRAM_CHANNEL)
+        if wait_for_img(T_IMG_LOADING) != None:
+            if wait_while_img(T_IMG_LOADING, 10):
+                # open telegram channel
+                pyautogui.hotkey("ctrl", "f", interval=0.01)
+                pyautogui.write("telegram", interval=0.01)
+                time.sleep(0.5)
+                wait_and_click_img(T_IMG_TELEGRAM_CHANNEL)
 
-        # join userinfobot channel
-        log_inf("join userinfobot channel ...")
-        pyautogui.write("tg://resolve?domain=userinfobot", interval=0.01)
-        pyautogui.press("enter")
+                # join userinfobot channel
+                log_inf("join userinfobot channel ...")
+                pyautogui.write("tg://resolve?domain=userinfobot", interval=0.01)
+                pyautogui.press("enter")
 
-        wait_and_click_img(T_IMG_USERINFOBOT_LINK)
+                wait_and_click_img(T_IMG_USERINFOBOT_LINK)
 
-        log_inf("loading ...")
-        wait_for_img(T_IMG_USERINFOBOT_WELCOME)
-        log_inf("start channel ...")
-        wait_and_click_img(T_IMG_USERINFOBOT_START)
+                log_inf("loading ...")
+                wait_for_img(T_IMG_USERINFOBOT_WELCOME)
+                log_inf("start channel ...")
+                wait_and_click_img(T_IMG_USERINFOBOT_START)
 
-        # copy & write user information
-        wait_and_right_click_img(T_IMG_USERINFOBOT_ID)
-        wait_and_click_img(T_IMG_USERINFOBOT_COPY)
-        userinfo = pyperclip.paste()
-        lines = userinfo.split("\n")
-        username = lines[0].strip()
-        telegram_id = lines[1].replace("Id:", "").strip()
-        log_inf(f"   username: {username}")
-        log_inf(f"telegram_id: {telegram_id}")
-
-        # join group
-        if TELEGRAM_GROUP_LINK != None:
-            group_id = TELEGRAM_GROUP_LINK.split("+", 1)[1].strip()
-            group_invite_link = f"tg://join?invite={group_id}"
-
-            pyautogui.write(group_invite_link, 0.01)
-            pyautogui.press("enter")
-
-            wait_and_click_img(T_IMG_GROUP_JOIN_LINK)
-            wait_and_click_img(T_IMG_GROUP_JOIN_BTN)
-
+                # copy & write user information
+                wait_and_right_click_img(T_IMG_USERINFOBOT_ID)
+                wait_and_click_img(T_IMG_USERINFOBOT_COPY)
+                userinfo = pyperclip.paste()
+                lines = userinfo.split("\n")
+                username = lines[0].strip()
+                telegram_id = lines[1].replace("Id:", "").strip()
+                log_inf(f"   username: {username}")
+                log_inf(f"telegram_id: {telegram_id}")
+            else:
+                log_err("loading timeout")
+        else:
+            log_err("loading image not found")
         # quit telegram
-        pyautogui.hotkey("ctrl", "q")
+        proc.kill()
     except:
         traceback.print_exc()
     return phone_number, username, telegram_id
@@ -185,11 +192,11 @@ def main():
                 }
             )
 
-        with open(os.path.join(CUR_DIR, "telegram_users.csv"), "w") as f:
-            writer = csv.writer(f)
-            writer.writerow(["No", "Phone", "Username", "Id"])
-            for i, userinfo in enumerate(userinfo_list):
-                writer.writerow([i, userinfo["phone"], userinfo["username"], userinfo["telegram_id"]])
+            with open(os.path.join(CUR_DIR, "telegram_users.csv"), "w") as f:
+                writer = csv.writer(f)
+                writer.writerow(["No", "Phone", "Username", "Id"])
+                for i, userinfo in enumerate(userinfo_list):
+                    writer.writerow([i, userinfo["phone"], userinfo["username"], userinfo["telegram_id"]])
     except:
         traceback.print_exc()
 
