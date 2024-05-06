@@ -12,8 +12,8 @@ import pyperclip
 
 from liblogger import log_err, log_inf
 
-# TELEGRAM_GROUP_LINK = None
-TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
+TELEGRAM_GROUP_LINK = None
+# TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
 
 CUR_DIR = str(Path(__file__).parent.absolute())
 TDATA_LIST_DIR = os.path.join(CUR_DIR, "82tdata")
@@ -113,10 +113,11 @@ def work(tdata_dir_name: str):
         # open telegram process
         openvpn_process = subprocess.Popen([TELEGRAM_BIN_PATH])
         log_inf("loading telegram ...")
-        wait_and_click_img(T_IMG_TELEGRAM_CHANNEL, 60)
+        wait_for_img(T_IMG_TELEGRAM_CHANNEL, 60)
 
         # maximize telegram window
         pyautogui.hotkey("winleft", "up")
+        wait_and_click_img(T_IMG_TELEGRAM_CHANNEL)
 
         # join userinfobot channel
         log_inf("join userinfobot channel ...")
@@ -190,6 +191,6 @@ def test():
 
 
 if __name__ == "__main__":
-    # main()
-    test()
+    main()
+    # test()
     input("Press ENTER to exit.")
