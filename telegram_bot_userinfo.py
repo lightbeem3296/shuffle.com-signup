@@ -23,6 +23,7 @@ TELEGRAM_BIN_PATH = os.path.join(TELEGRAM_DIR, "Telegram.exe")
 TDATA_PATH = os.path.join(TELEGRAM_DIR, "tdata")
 
 T_IMG_LOADING = "t_loading.png"
+T_IMG_AUTH_ERROR = os.path.join(CUR_DIR, "t_auth_error.png")
 T_IMG_TELEGRAM_CHANNEL = os.path.join(CUR_DIR, "t_telegram_channel.png")
 
 T_IMG_USERINFOBOT_LINK = os.path.join(CUR_DIR, "t_userinfobot_link.png")
@@ -58,7 +59,7 @@ def wait_for_img(img_path: str, timeout: float = 5):
         except:
             pass
         time.sleep(0.1)
-    time.sleep(0.1)
+    time.sleep(0.5)
     return img_box
 
 
@@ -75,7 +76,7 @@ def wait_while_img(img_path: str, timeout: float = 30) -> bool:
         except:
             break
         time.sleep(0.1)
-    time.sleep(0.1)
+    time.sleep(0.5)
     return ret
 
 
@@ -96,7 +97,7 @@ def wait_and_click_img(img_path: str, timeout: float = 5):
             x=img_box.left + img_box.width // 2,
             y=img_box.top + img_box.height // 2,
         )
-        time.sleep(0.1)
+        time.sleep(0.5)
 
 
 def wait_and_right_click_img(img_path: str, timeout: float = 5):
@@ -132,39 +133,42 @@ def work(tdata_dir_name: str):
         shutil.copytree(src_tdata_dir_path, TDATA_PATH)
 
         # open telegram process
-        proc = subprocess.Popen([TELEGRAM_BIN_PATH])
         log_inf("loading telegram ...")
+        proc = subprocess.Popen([TELEGRAM_BIN_PATH])
         time.sleep(3)
 
         if wait_for_img(T_IMG_LOADING) != None:
             if wait_while_img(T_IMG_LOADING, 10):
-                # open telegram channel
-                pyautogui.hotkey("ctrl", "f", interval=0.01)
-                pyautogui.write("telegram", interval=0.01)
-                time.sleep(0.5)
-                wait_and_click_img(T_IMG_TELEGRAM_CHANNEL)
+                # check authentication
+                if wait_for_img(T_IMG_AUTH_ERROR, timeout=1) == None:
+                    # open telegram channel
+                    pyautogui.hotkey("ctrl", "f", interval=0.01)
+                    pyautogui.write("telegram", interval=0.01)
+                    time.sleep(0.5)
+                    wait_and_click_img(T_IMG_TELEGRAM_CHANNEL)
 
-                # join userinfobot channel
-                log_inf("join userinfobot channel ...")
-                pyautogui.write("tg://resolve?domain=userinfobot", interval=0.01)
-                pyautogui.press("enter")
+                    # join userinfobot channel
+                    log_inf("join userinfobot channel ...")
+                    pyautogui.write("tg://resolve?domain=userinfobot", interval=0.01)
+                    pyautogui.press("enter")
 
-                wait_and_click_img(T_IMG_USERINFOBOT_LINK)
+                    wait_and_click_img(T_IMG_USERINFOBOT_LINK)
 
-                log_inf("loading ...")
-                wait_for_img(T_IMG_USERINFOBOT_WELCOME)
-                log_inf("start channel ...")
-                wait_and_click_img(T_IMG_USERINFOBOT_START)
+                    log_inf("loading ...")
+                    wait_for_img(T_IMG_USERINFOBOT_WELCOME)
+                    log_inf("start channel ...")
+                    wait_and_click_img(T_IMG_USERINFOBOT_START, timeout=1)
 
-                # copy & write user information
-                wait_and_right_click_img(T_IMG_USERINFOBOT_ID)
-                wait_and_click_img(T_IMG_USERINFOBOT_COPY)
-                userinfo = pyperclip.paste()
-                lines = userinfo.split("\n")
-                username = lines[0].strip()
-                telegram_id = lines[1].replace("Id:", "").strip()
-                log_inf(f"   username: {username}")
-                log_inf(f"telegram_id: {telegram_id}")
+                    # copy & write user information
+                    wait_and_right_click_img(T_IMG_USERINFOBOT_ID)
+                    wait_and_click_img(T_IMG_USERINFOBOT_COPY)
+                    userinfo = pyperclip.paste()
+                    lines = userinfo.split("\n")
+                    username = lines[0].strip()
+                    telegram_id = lines[1].replace("Id:", "").strip()
+                    log_inf(f"     userinfo: {username}, {telegram_id}")
+                else:
+                    log_err("authentication error")
             else:
                 log_err("loading timeout")
         else:
@@ -182,6 +186,7 @@ def main():
 
         tdata_dir_list = os.listdir(TDATA_LIST_DIR)
         for i, tdata_dir_name in enumerate(tdata_dir_list):
+            print()
             log_inf(f"working on {i} / {len(tdata_dir_list)} ...")
             tdata_dir_path = os.path.join(TDATA_LIST_DIR, tdata_dir_name)
             if not os.path.isdir(tdata_dir_path):

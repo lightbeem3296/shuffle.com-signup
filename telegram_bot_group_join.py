@@ -15,9 +15,9 @@ from liblogger import log_err, log_inf, log_warn
 ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
 
 
-TELEGRAM_GROUP_LINK = "https://t.me/+VpBfVmk9n_82ZjM0"
+# TELEGRAM_GROUP_LINK = "https://t.me/+VpBfVmk9n_82ZjM0"
 # TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
-# TELEGRAM_GROUP_LINK = None
+TELEGRAM_GROUP_LINK = None
 
 CUR_DIR = str(Path(__file__).parent.absolute())
 TDATA_LIST_DIR = os.path.join(CUR_DIR, "82tdata")
@@ -62,7 +62,7 @@ def wait_for_img(img_path: str, timeout: float = 5):
         except:
             pass
         time.sleep(0.1)
-    time.sleep(0.1)
+    time.sleep(0.5)
     return img_box
 
 
@@ -79,7 +79,7 @@ def wait_while_img(img_path: str, timeout: float = 30) -> bool:
         except:
             break
         time.sleep(0.1)
-    time.sleep(0.1)
+    time.sleep(0.5)
     return ret
 
 
@@ -101,6 +101,7 @@ def wait_and_click_img(img_path: str, timeout: float = 5, region=None):
             y=img_box.top + img_box.height // 2,
         )
         time.sleep(0.1)
+    time.sleep(0.5)
 
 
 def wait_and_right_click_img(img_path: str, timeout: float = 5):
@@ -121,6 +122,7 @@ def wait_and_right_click_img(img_path: str, timeout: float = 5):
             y=img_box.top + img_box.height // 2,
         )
         time.sleep(0.1)
+    time.sleep(0.5)
 
 
 def work(tdata_dir_name: str):
