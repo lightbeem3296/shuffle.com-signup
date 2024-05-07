@@ -54,7 +54,7 @@ def wait_for_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.9)
         except:
             pass
         time.sleep(0.1)
@@ -71,7 +71,7 @@ def wait_while_img(img_path: str, timeout: float = 30) -> bool:
             ret = False
             break
         try:
-            pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            pyautogui.locateOnScreen(img_path, confidence=0.9)
         except:
             break
         time.sleep(0.1)
@@ -87,7 +87,7 @@ def wait_and_click_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.9)
         except:
             pass
         time.sleep(0.1)
@@ -107,7 +107,7 @@ def wait_and_right_click_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.9)
         except:
             pass
         time.sleep(0.1)
