@@ -15,8 +15,9 @@ from liblogger import log_err, log_inf, log_warn
 ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
 
 
+TELEGRAM_GROUP_LINK = "https://t.me/+VpBfVmk9n_82ZjM0"
 # TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
-TELEGRAM_GROUP_LINK = None
+# TELEGRAM_GROUP_LINK = None
 
 CUR_DIR = str(Path(__file__).parent.absolute())
 TDATA_LIST_DIR = os.path.join(CUR_DIR, "82tdata")
@@ -24,8 +25,9 @@ TELEGRAM_DIR = os.path.join(CUR_DIR, "Telegram")
 TELEGRAM_BIN_PATH = os.path.join(TELEGRAM_DIR, "Telegram.exe")
 TDATA_PATH = os.path.join(TELEGRAM_DIR, "tdata")
 
-T_IMG_LOADING = "t_loading.png"
+T_IMG_LOADING = os.path.join(CUR_DIR, "t_loading.png")
 T_IMG_TELEGRAM_CHANNEL = os.path.join(CUR_DIR, "t_telegram_channel.png")
+T_IMG_WRITE_A_MESSAGE = os.path.join(CUR_DIR, "t_write_a_message.png")
 
 T_IMG_USERINFOBOT_LINK = os.path.join(CUR_DIR, "t_userinfobot_link.png")
 T_IMG_USERINFOBOT_WELCOME = os.path.join(CUR_DIR, "t_userinfobot_welcome.png")
@@ -56,7 +58,7 @@ def wait_for_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.9, grayscale=True)
         except:
             pass
         time.sleep(0.1)
@@ -73,7 +75,7 @@ def wait_while_img(img_path: str, timeout: float = 30) -> bool:
             ret = False
             break
         try:
-            pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            pyautogui.locateOnScreen(img_path, confidence=0.9, grayscale=True)
         except:
             break
         time.sleep(0.1)
@@ -81,7 +83,7 @@ def wait_while_img(img_path: str, timeout: float = 30) -> bool:
     return ret
 
 
-def wait_and_click_img(img_path: str, timeout: float = 5):
+def wait_and_click_img(img_path: str, timeout: float = 5, region=None):
     img_box = None
     start_tstamp = datetime.now().timestamp()
     while img_box == None:
@@ -89,7 +91,7 @@ def wait_and_click_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.9, grayscale=True, region=region)
         except:
             pass
         time.sleep(0.1)
@@ -109,7 +111,7 @@ def wait_and_right_click_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.9, grayscale=True)
         except:
             pass
         time.sleep(0.1)
@@ -153,8 +155,10 @@ def work(tdata_dir_name: str):
                     pyautogui.write(group_invite_link, 0.01)
                     pyautogui.press("enter")
 
-                    wait_and_click_img(T_IMG_GROUP_JOIN_LINK)
+                    input_box = wait_for_img(T_IMG_WRITE_A_MESSAGE)
+                    wait_and_click_img(T_IMG_GROUP_JOIN_LINK, region=(0, input_box.top-50, pyautogui.size().width, 100))
                     wait_and_click_img(T_IMG_GROUP_JOIN_BTN)
+                    time.sleep(1)
             else:
                 log_err("loading timeout")
         else:
@@ -181,8 +185,7 @@ def main():
 
 
 def test():
-    work("+14504108476")
-    work("+14504230543")
+    work("+14504230538")
 
 
 if __name__ == "__main__":
