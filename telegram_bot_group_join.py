@@ -4,13 +4,19 @@ import subprocess
 import time
 import traceback
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 
 import pyautogui
+from PIL import ImageGrab
 
 from liblogger import log_err, log_inf, log_warn
 
-TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
+ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
+
+
+# TELEGRAM_GROUP_LINK = "https://t.me/+gM9UAN5ygO44ODU0"  # tg://join?invite=gM9UAN5ygO44ODU0
+TELEGRAM_GROUP_LINK = None
 
 CUR_DIR = str(Path(__file__).parent.absolute())
 TDATA_LIST_DIR = os.path.join(CUR_DIR, "82tdata")
@@ -50,7 +56,7 @@ def wait_for_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.8)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
         except:
             pass
         time.sleep(0.1)
@@ -67,7 +73,7 @@ def wait_while_img(img_path: str, timeout: float = 30) -> bool:
             ret = False
             break
         try:
-            pyautogui.locateOnScreen(img_path, confidence=0.8)
+            pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
         except:
             break
         time.sleep(0.1)
@@ -83,7 +89,7 @@ def wait_and_click_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.8)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
         except:
             pass
         time.sleep(0.1)
@@ -103,7 +109,7 @@ def wait_and_right_click_img(img_path: str, timeout: float = 5):
             log_err("timeout")
             break
         try:
-            img_box = pyautogui.locateOnScreen(img_path, confidence=0.8)
+            img_box = pyautogui.locateOnScreen(img_path, confidence=0.5, grayscale=True)
         except:
             pass
         time.sleep(0.1)
